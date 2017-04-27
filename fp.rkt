@@ -32,48 +32,64 @@
          )
 )
 
-; Function that given 2 simple lists, L1, L2 returns the minimum
-; of the numbers
+; Helper functions for function (min-above-min)
 
+; Function generates list of numbers from a given
+; list
 (DEFINE (return-num-list L)
         (COND
-             ((NULL? L) '())
+             ((OR (NULL? L) (EQ? L '())) '())
              ((NOT (NUMBER? (CAR L))) (return-num-list (CDR L)))
-             (ELSE (APPEND (CAR L) (return-num-list (CDR L))))
+             (ELSE (APPEND (LIST (CAR L)) (return-num-list (CDR L))))
         )
 )
 
-; selection sort
+; Selction sort sorts list of numbers in ascending order
+; Selection sort starts
 
 (DEFINE (selection L) 
-   (cond ( (null? L) '() )
-         ( else (cons (smallest L (car L)) 
-                      (selection (remove L (smallest L (car L)))))
+   (COND ( (NULL? L) '() )
+         ( ELSE (cons (smallest L (CAR L)) 
+                      (selection (remove L (smallest L (CAR L)))))
                                                
          )
    )
 )
 
-(define (remove L A)                
-  (cond ( (null? L) '() )           
-        ( (= (car L) A) (cdr L))
-        (else (cons (car L)(remove (cdr L) A)))
+(DEFINE (remove L N)                
+  (COND ( (NULL? L) '() )           
+        ( (= (CAR L) N) (CDR L))
+        (ELSE (CONS (CAR L)(remove (CDR L) N)))
   )
 )
 
-(define (smallest L A)
-  (cond ( (null? L) A)
-        ( (< (car L) A) (smallest (cdr L)(car L)))
-        (else (smallest (cdr L) A ))
+; Given a list and
+(DEFINE (smallest L N)
+  (COND ( (NULL? L) N)
+        ( (< (CAR L) N) (smallest (CDR L)(CAR L)))
+        (ELSE (smallest (CDR L) N ))
   )
 )
 
-(DEFINE (first-larger L N)
+; Selection sort ends
+
+; Function that given
+(DEFINE (find-first-greater L N)
         (COND
              ((NULL? L) #F)
-             ((>= (CAR L) N) (first-larger (CDR L) N))
+             ((<= (CAR L) N) (find-first-greater (CDR L) N))
              (ELSE (CAR L))
          )
 )
+; Help functions end
 
-; 
+; Function that given 2 simple lists, L1, L2 returns the minimum
+; of the numbers returns the mininum of the numbers in L1
+; that are larger than the smallest number in L2
+(DEFINE (min-above-min L1 L2)
+        (COND
+             ((EQ? (return-num-list L1) '()) #F)
+             ((EQ? (return-num-list L2) '()) (CAR (selection (return-num-list L1))))
+             (ELSE (find-first-greater (selection (return-num-list L2)) (CAR (selection (return-num-list L1)))))
+        )
+)
